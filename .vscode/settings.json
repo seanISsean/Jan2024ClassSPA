@@ -17,7 +17,5 @@
   "stylelint.enable": true,
   "workbench.enableExperiments": false,
   "workbench.view.alwaysShowHeaderActions": true,
-  "files.associations": {
-    "*.js": "html"
-  }
+
 }
