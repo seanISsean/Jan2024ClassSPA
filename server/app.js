@@ -1,9 +1,26 @@
 // 'Import' the Express module instead of http
 import express from "express";
 import dotenv from "dotenv";
+import mongoose from "mongoose";
+import pizzas from "./routers/pizzas.js";
 
 // Load environment variables from .env file
 dotenv.config();
+
+// Connect to mongodb atlas server
+mongoose.connect(process.env.MONGODB, {
+  // Configuration options to remove deprecation warnings, just include them to remove clutter
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+});
+
+const db = mongoose.connection;
+
+db.on("error", console.error.bind(console, "Connection Error:"));
+db.once(
+  "open",
+  console.log.bind(console, "Successfully opened connection to Mongo!")
+);
 
 // get the PORT from the environment variables, OR use 4040 as default
 const PORT = process.env.PORT || 4040;
@@ -35,6 +52,20 @@ const cors = (req, res, next) => {
 app.use(cors);
 app.use(express.json());
 app.use(logging);
+
+app.get("/", (request, response) => {
+  response.json({
+    hours: {
+      monday: "Closed",
+      tuesday: "10am-8pm",
+      wednesday: "10am-8pm",
+      thursday: "10am-8pm",
+      friday: "10am-10pm",
+      saturday: "10am-12am",
+      sunday: "10am-6pm"
+    }
+  });
+});
 
 // Handle the request with HTTP GET method from http://localhost:4040/status
 app.get("/status", (request, response) => {
@@ -83,6 +114,8 @@ app.get("/weather/:city", (request, response) => {
     city
   });
 });
+
+app.use("/pizzas", pizzas);
 
 // Tell the Express app to start listening
 // Let the humans know I am running and listening on 4040
